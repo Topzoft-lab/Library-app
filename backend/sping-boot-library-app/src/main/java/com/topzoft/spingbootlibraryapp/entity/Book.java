@@ -34,8 +34,8 @@ public class Book {
 	@Column(name="copies_available")
 	private int copiesAvailable;
 
-	@Column(name="categories")
-	private String categories;
+	@Column(name="category")
+	private String category;
 
 	@Column(name="img")
 	private String img;
