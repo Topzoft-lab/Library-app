@@ -10,7 +10,7 @@ import com.topzoft.spingbootlibraryapp.entity.Book;
 
 @Configuration
 public class MyDataRestConfigure implements RepositoryRestConfigurer {
-	public String theAllowedOrigin ="http://localhost:3001";
+	public String theAllowedOrigin ="http://localhost:3000";
 	
 	@Override
 	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {

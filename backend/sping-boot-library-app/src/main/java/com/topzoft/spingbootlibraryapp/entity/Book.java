@@ -1,4 +1,4 @@
-package com.topzoft.spingbootlibraryapp.entity;
+ package com.topzoft.spingbootlibraryapp.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

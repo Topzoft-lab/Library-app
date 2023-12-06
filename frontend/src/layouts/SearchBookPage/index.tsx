@@ -13,13 +13,18 @@ export const SearchBookPage = () => {
   const [bookPerPage] = useState(5);
   const [totalAmountsOfBook, setTotalAmountsOfBook] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [search, setSearch] = useState("");
+  const [searchUrl, setSearchUrl] = useState("");
+  const [categorySelection, setCategorySelection] = useState("Book Category");
 
   useEffect(() => {
     const fetchBooks = async () => {
       const baseUrl: string = "http://localhost:8080/api/books";
-      const url: string = `${baseUrl}?page=${currentPage - 1}&size=${bookPerPage}`;
+      const url: string = searchUrl === "" ? `${baseUrl}?page=${currentPage - 1}&size=${bookPerPage}` : baseUrl + searchUrl;
+      console.log(url);
 
       const response = await fetch(url);
+      console.log(response);
 
       if (!response.ok) {
         throw new Error("something is wrong");
@@ -54,7 +59,7 @@ export const SearchBookPage = () => {
       setIsLoading(false);
       setHttpError(error);
     });
-  }, [currentPage]);
+  }, [currentPage, searchUrl]);
 
   if (isLoading) {
     return <SpinnerLoading />;
@@ -67,6 +72,24 @@ export const SearchBookPage = () => {
     );
   }
 
+  const categoryField = (value: string) => {
+    if (value.toLowerCase() === "be" || value.toLowerCase() === "fe" || value.toLowerCase() === "data" || value.toLowerCase() === "devops") {
+      setCategorySelection(value);
+      setSearchUrl(`/search/findByCategory?category=${value}&page=0&size=${bookPerPage}`);
+    } else {
+      setCategorySelection("All");
+      setSearchUrl(`?page=0&size=${bookPerPage}`);
+    }
+  };
+
+  const searchHandleChange = () => {
+    // console.log("iam clicked");
+    if (search === "") {
+      setSearchUrl("");
+    } else {
+      setSearchUrl(`/search/findByTitleContaining?title=${search}&page=0&size=${bookPerPage}`);
+    }
+  };
   const indexOfLastBook: number = currentPage * bookPerPage;
   const indexOfFirstBook: number = indexOfLastBook - bookPerPage;
   let lastItem: number = indexOfLastBook <= totalAmountsOfBook ? indexOfLastBook : totalAmountsOfBook;
@@ -77,17 +100,33 @@ export const SearchBookPage = () => {
     <div>
       <div className="container">
         <div>
-          <FilterBar />
-          <div className="mt-3">
-            <h5>Number of results: ({totalAmountsOfBook})</h5>
-          </div>
-          <p>
-            {indexOfFirstBook + 1} to {lastItem} of {totalAmountsOfBook} items:{" "}
-          </p>
-          {books.map((book) => (
-            <SearchBook book={book} key={book.id} />
-          ))}
-          {totalPages > 1 && <Pagination currentPage={currentPage} totalPage={totalPages} paginate={paginate} />}
+          <FilterBar
+            onSearchTermChange={(value: string) => setSearch(value)}
+            onButtonClicked={searchHandleChange}
+            categoryAction={(value: string) => categoryField(value)}
+            categoryValue={categorySelection}
+          />
+          {totalAmountsOfBook > 0 ? (
+            <>
+              <div className="mt-3">
+                <h5>Number of results: ({totalAmountsOfBook})</h5>
+              </div>
+              <p>
+                {indexOfFirstBook + 1} to {lastItem} of {totalAmountsOfBook} items:{" "}
+              </p>
+              {books.map((book) => (
+                <SearchBook book={book} key={book.id} />
+              ))}
+              {totalPages > 1 && <Pagination currentPage={currentPage} totalPage={totalPages} paginate={paginate} />}
+            </>
+          ) : (
+            <div className="m-5">
+              <h3>can't find what you are looking for?</h3>
+              <a type="button" href="#" className="btn main-color btn-md px-4 me-md-2 fw-bold text-white ">
+                Library Services
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>
